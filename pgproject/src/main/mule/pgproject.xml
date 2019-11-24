@@ -5,6 +5,7 @@
 	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+
 	<db:config name="SQLServer_Config" doc:name="Database Config" doc:id="6d76fd1f-41c3-45b9-b766-37f1ffbac201" >
 		<db:mssql-connection host="Abiy" user="sa" password="Mahi@911" databaseName="banking" />
 	</db:config>
@@ -14,25 +15,47 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
      VALUES(:custid, :fname, :lname, :addid, :phone, :email, :dob)</db:sql>
 		</db:bulk-insert>
 		<ee:transform doc:name="Transform Message" doc:id="a96b6ff3-dce1-4c6b-871f-d56eea05c9cc" >
+
+	<db:config name="SQLServer_Config" doc:name="Database Config" doc:id="a4d456ab-951f-47fb-b199-11b59ef2a62c" >
+		<db:mssql-connection host="Abiy" user="sa" password="Mahi@911" databaseName="banking" />
+	</db:config>
+	<flow name="post_CustomerDetail" doc:id="21db12db-5bda-45a2-a76d-9430acd3de69" >
+		<db:bulk-insert doc:name="Bulk insert" doc:id="dcb58843-f951-43e7-b977-34fdae07242a" config-ref="SQLServer_Config">
+			<db:sql >INSERT INTO tbl_customers(cust_id,first_name,last_name,address_id ,phone,email,birth_date)
+     VALUES(:custid, :fname, :lname, :addid, :phone, :email, :dob)</db:sql>
+		</db:bulk-insert>
+		<ee:transform doc:name="Transform Message" doc:id="be47aa5b-a759-48b6-a97b-72ce39ff6846" >
+
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
 ---
 {
+
 	"message": "Record added succesfully to database"
+
+	"message": "Record added succesfully"
+
 }]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
 		
 	  
 	</flow>
+
 	<flow name="get_CustomerDetail" doc:id="2d422e1a-90df-4d7f-b796-fe2864226c1c" >
 		<db:select doc:name="Select" doc:id="423ab60f-f787-4299-8cfd-774568faf0b5" config-ref="SQLServer_Config">
+
+	<flow name="get_CustomerDetail" doc:id="58ad6333-057d-46bc-9dfd-781bda8f9f10" >
+		<db:select doc:name="Select" doc:id="69771e56-9c1a-443c-8848-0f5970952c66" config-ref="SQLServer_Config">
 			<db:sql >SELECT cust_id,first_name,last_name,phone,email,birth_date,city,zip_code,state,country 
 FROM tbl_customers as c JOIN tbl_address as a
 ON c.address_id=a.address_id</db:sql>
 		</db:select>
+
 		<ee:transform doc:name="Transform Message" doc:id="64924e8f-7027-4612-87d8-fd222b5a6b95" >
+
+		<ee:transform doc:name="Transform Message" doc:id="2777369a-77f5-4e02-88bb-c35edc6a16a0" >
 			<ee:message >
 				<ee:set-payload resource="getresouce.dwl" />
 			</ee:message>
